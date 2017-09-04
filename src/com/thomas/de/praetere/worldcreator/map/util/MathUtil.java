@@ -1,6 +1,6 @@
-package com.thomas.de.praetere.worldcreator.math;
+package com.thomas.de.praetere.worldcreator.map.util;
 
-public class Math {
+public class MathUtil {
     /**
      * Calculates whether the value x is between the lower and the upper bound.
      *
@@ -23,5 +23,15 @@ public class Math {
      */
     public static boolean between(int l, int u, int x) {
         return betweenStrict(l, u, x) || x == l || x == u;
+    }
+
+    /**
+     * Converts a double between 0.0 and 1.0 to an int between 0 and 256 (exclusive).
+     *
+     * @return An integer between 0 and 256 (exclusive).
+     */
+    public static int makeBetween256(double aDouble) {
+        long round = Math.round(aDouble * 255);
+        return (int) round;
     }
 }
