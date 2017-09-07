@@ -9,6 +9,7 @@ import com.thomas.de.praetere.worldcreator.map.util.Lowest;
 import com.thomas.de.praetere.worldcreator.map.util.MathUtil;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +33,6 @@ public class ToImagePrinter implements ConstantTransformer {
             for (int j = 0; j < map.getMaxY(); j++) {
                 Optional<MapPoint> point = map.getPoint(i, j);
                 if (point.isPresent()) {
-                    System.out.println(toRgb(point.get(), minHeight, maxHeight));
                     image.setRGB(i, j, toRgb(point.get(), minHeight, maxHeight));
                 }
             }
@@ -45,6 +45,8 @@ public class ToImagePrinter implements ConstantTransformer {
     }
 
     private int toRgb(MapPoint point, double lowest, double highest) {
-        return MathUtil.makeBetween256((point.getHeight() - lowest) / (highest - lowest));
+        int col = MathUtil.makeBetween256((point.getHeight() - lowest) / (highest - lowest));
+        Color c = new Color(col, col, col);
+        return c.getRGB();
     }
 }
