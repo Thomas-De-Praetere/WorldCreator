@@ -44,4 +44,12 @@ public class Location {
     public int getY() {
         return y;
     }
+
+    public double getDistance(Location loc) {
+        return Math.sqrt((x - loc.x) * (x - loc.x) + (y - loc.y) * (y - loc.y));
+    }
+
+    public double getDistance(int x, int y) {
+        return getDistance(new Location(x, y));
+    }
 }

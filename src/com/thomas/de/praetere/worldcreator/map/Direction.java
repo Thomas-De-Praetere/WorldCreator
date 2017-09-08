@@ -5,7 +5,7 @@ import com.thomas.de.praetere.worldcreator.geometry.Location;
 /**
  * This class represents a location of a neighbour of a {@link MapPoint}.
  */
-enum Direction {
+public enum Direction {
     NORTH(0, 1), EAST(1, 0), SOUTH(0, -1), WEST(-1, 0);
 
     private final int x;
