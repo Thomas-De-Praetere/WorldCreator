@@ -1,6 +1,8 @@
 package com.thomas.de.praetere.worldcreator.map.util;
 
 public class MathUtil {
+    public static double EPSILON = 10E-2;
+
     /**
      * Calculates whether the value x is between the lower and the upper bound.
      *
@@ -33,5 +35,9 @@ public class MathUtil {
     public static int makeBetween256(double aDouble) {
         long round = Math.round(aDouble * 255);
         return (int) round;
+    }
+
+    public static boolean isZero(double d) {
+        return d < EPSILON && d > -EPSILON;
     }
 }

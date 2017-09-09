@@ -1,7 +1,5 @@
 package com.thomas.de.praetere.worldcreator.geometry;
 
-import com.thomas.de.praetere.worldcreator.map.transformer.Operation;
-
 /**
  * A point is an extension of a location with a double height.
  */
@@ -56,8 +54,13 @@ public class Point extends Location {
         this.height = height;
     }
 
-    public void operateOnHeight(double newValue, Operation operation) {
-        height = operation.apply(height, newValue);
-    }
 
+    @Override
+    public String toString() {
+        return "Point{" +
+                "height=" + height +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

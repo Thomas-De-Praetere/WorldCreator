@@ -1,18 +1,15 @@
 package com.thomas.de.praetere.worldcreator.map;
 
+import com.thomas.de.praetere.worldcreator.geometry.Location;
 import com.thomas.de.praetere.worldcreator.geometry.Point;
 
-import java.util.EnumMap;
 import java.util.Optional;
 
 /**
  * A {@link MapPoint} is a point with neighbours and other data that can be used in a map.
  */
 public class MapPoint extends Point {
-    /**
-     * The neighbours of a MapPoint.
-     */
-    private final EnumMap<Direction, MapPoint> neighbours;
+    private final Map map;
 
     /**
      * Creates a MapPoint with a given height and location.
@@ -21,9 +18,9 @@ public class MapPoint extends Point {
      * @param y      The y location.
      * @param height The height.
      */
-    public MapPoint(int x, int y, double height) {
+    public MapPoint(int x, int y, double height, Map map) {
         super(x, y, height);
-        neighbours = new EnumMap<>(Direction.class);
+        this.map = map;
     }
 
     /**
@@ -32,8 +29,8 @@ public class MapPoint extends Point {
      * @param x The x location.
      * @param y The y location.
      */
-    public MapPoint(int x, int y) {
-        this(x, y, 0.0);
+    public MapPoint(int x, int y, Map map) {
+        this(x, y, 0.0, map);
     }
 
     /**
@@ -43,18 +40,9 @@ public class MapPoint extends Point {
      * @return A {@link MapPoint} if it exists.
      */
     public Optional<MapPoint> getNeighbour(Direction direction) {
-        return Optional.ofNullable(neighbours.get(direction));
+        return map.getNeighbour(this, direction);
     }
 
-    /**
-     * Sets a neighbour in a given direction.
-     *
-     * @param mapPoint  The new neighbour.
-     * @param direction The direction in which it is.
-     */
-    public void setNeighbour(MapPoint mapPoint, Direction direction) {
-        neighbours.put(direction, mapPoint);
-    }
 
     /**
      * Changes the height of the {@link MapPoint}.
@@ -63,5 +51,20 @@ public class MapPoint extends Point {
      */
     public void changeHeight(double value) {
         height += value;
+    }
+
+    @Override
+    public double getDistance(Location loc) {
+        double normalDist = super.getDistance(loc);
+        Location largestX = (this.x > loc.getX()) ? this : loc;
+        Location smallestX = (this.x > loc.getX()) ? loc : this;
+        Location transposed = new Location(largestX.getX() - map.getMaxX(), largestX.getY());
+        double otherDist = transposed.getDistance(smallestX);
+        return Math.min(normalDist, otherDist);
+    }
+
+    @Override
+    public double getDistance(int x, int y) {
+        return getDistance(new Location(x, y));
     }
 }

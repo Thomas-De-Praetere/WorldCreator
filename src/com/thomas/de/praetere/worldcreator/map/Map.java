@@ -1,9 +1,13 @@
 package com.thomas.de.praetere.worldcreator.map;
 
 import com.thomas.de.praetere.worldcreator.geometry.Location;
+import com.thomas.de.praetere.worldcreator.map.transformer.Operation;
+import com.thomas.de.praetere.worldcreator.map.transformer.Transformer;
 import com.thomas.de.praetere.worldcreator.map.util.MathUtil;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public class Map implements Iterable<MapPoint> {
@@ -12,16 +16,22 @@ public class Map implements Iterable<MapPoint> {
     private final int maxX;
     private final int maxY;
 
+    private final List<TransformerOperation> transformers;
+
     public Map(int maxX, int maxY) {
+        this.transformers = new ArrayList<>();
         this.maxX = maxX;
         this.maxY = maxY;
         map = new MapPoint[maxX][maxY];
         for (int x = 0; x < maxX; x++) {
             for (int y = 0; y < maxY; y++) {
-                map[x][y] = new MapPoint(x, y);
-                setNeighbours(map[x][y]);
+                map[x][y] = new MapPoint(x, y, this);
             }
         }
+    }
+
+    public void register(Transformer transformer, Operation operation) {
+        transformers.add(new TransformerOperation(transformer, operation));
     }
 
     public int getMaxX() {
@@ -32,28 +42,38 @@ public class Map implements Iterable<MapPoint> {
         return maxY;
     }
 
+    public Optional<MapPoint> getPoint(Location location) {
+        return getPoint(location.getX(), location.getY());
+    }
+
     public Optional<MapPoint> getPoint(int x, int y) {
-        if (MathUtil.between(0, maxX - 1, x) && MathUtil.between(0, maxY, y)) {
-            return Optional.of(map[x][y]);
+        if (MathUtil.between(0, maxY - 1, y)) {
+            return Optional.of(map[Math.floorMod(x, maxX)][y]);
         } else {
             return Optional.empty();
         }
     }
 
-    private void setNeighbours(MapPoint mapPoint) {
-        for (Direction direction : Direction.values()) {
-            Location neighbourLocation = direction.getLocation(mapPoint);
-            MapPoint neighbour = null;
-            if (MathUtil.between(0, maxY - 1, neighbourLocation.getY())) {
-                neighbour = map[Math.floorMod(neighbourLocation.getX(), maxX)][neighbourLocation.getY()];
+    public Optional<MapPoint> getNeighbour(MapPoint point, Direction direction) {
+        return getPoint(direction.getLocation(point));
+    }
+
+    public void calculate() {
+        int i = 0;
+        int k = 1;
+        int max = maxX * maxY;
+        for (MapPoint mapPoint : this) {
+            for (TransformerOperation transformer : transformers) {
+                double newHeight = transformer.transformer.transform(mapPoint, transformer.operation);
+                mapPoint.setHeight(newHeight);
             }
-            mapPoint.setNeighbour(neighbour, direction);
-            if (neighbour != null) {
-                neighbour.setNeighbour(mapPoint, direction.getOpposite());
+            i++;
+            if (i == k) {
+                k += maxX;
+                System.out.println(String.format("Calculation %f%%.", 100*(double) i / (double) max));
             }
         }
     }
-
 
     @Override
     public Iterator<MapPoint> iterator() {
@@ -84,6 +104,25 @@ public class Map implements Iterable<MapPoint> {
                 j++;
             }
             return mapPoint;
+        }
+    }
+
+    private static class TransformerOperation {
+        private final Transformer transformer;
+        private final Operation operation;
+
+        public Transformer getTransformer() {
+            return transformer;
+        }
+
+        public Operation getOperation() {
+            return operation;
+        }
+
+        public TransformerOperation(Transformer transformer, Operation operation) {
+
+            this.transformer = transformer;
+            this.operation = operation;
         }
     }
 }

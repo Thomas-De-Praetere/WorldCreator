@@ -1,20 +1,16 @@
 package com.thomas.de.praetere.worldcreator.map.transformer;
 
-public enum Operations implements Operation {
-    SUM((o, n) -> o + n),
-    SUBTRACT((o, n) -> o - n),
-    MAX(Math::max),
-    MIN(Math::min),
-    NULL((o, n) -> o),
-    REPLACE((o, n) -> n);
-    private final Operation function;
+public class Operations {
+    public static Operation SUM = (o, n) -> o + n;
 
-    Operations(Operation function) {
-        this.function = function;
-    }
+    public static Operation SUBTRACT = (o, n) -> o - n;
 
-    @Override
-    public double apply(double originalValue, double newValue) {
-        return function.apply(originalValue, newValue);
-    }
+    public static Operation MAX = Math::max;
+
+    public static Operation MIN = Math::min;
+
+    public static Operation NULL = (o, n) -> o;
+
+    public static Operation REPLACE = (o, n) -> n;
+    public static Operation MEAN = (o, n) -> (o + n) / 2.0;
 }

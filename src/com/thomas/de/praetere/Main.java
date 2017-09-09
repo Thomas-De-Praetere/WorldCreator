@@ -1,22 +1,26 @@
 package com.thomas.de.praetere;
 
 import com.thomas.de.praetere.worldcreator.map.Map;
-import com.thomas.de.praetere.worldcreator.map.mountain.Mountain;
+import com.thomas.de.praetere.worldcreator.map.elevation.RandomElevationCreatorCreator;
 import com.thomas.de.praetere.worldcreator.map.printer.ToImagePrinter;
 import com.thomas.de.praetere.worldcreator.map.transformer.Operations;
-import com.thomas.de.praetere.worldcreator.map.transformer.Transformer;
 
 public class Main {
 
     public static void main(String[] args) {
-        Map map = new Map(1024, 1024);
-        ToImagePrinter printer = new ToImagePrinter("C:\\Test", "test.jpg");
-        Transformer transformer = new Mountain(512, 512, 200);
-        transformer.transform(map, Operations.MAX);
-        transformer = new Mountain(512, 300, 200);
-        transformer.transform(map, Operations.MAX);
-        transformer = new Mountain(512, 100, 200);
-        transformer.transform(map, Operations.MAX);
-        printer.transform(map);
+        System.out.println("Application Start");
+        Map map = new Map(2000, 2000);
+        System.out.println("Map Created");
+
+        RandomElevationCreatorCreator creator = new RandomElevationCreatorCreator(10, 500.0);
+        creator.create(map).forEach(a -> map.register(a, Operations.MAX));
+
+        creator = new RandomElevationCreatorCreator(50, 300);
+        creator.create(map).forEach(a -> map.register(a, Operations.MAX));
+
+        map.calculate();
+
+        ToImagePrinter printer = new ToImagePrinter("C:\\Test", "test.png");
+        printer.create(map);
     }
 }

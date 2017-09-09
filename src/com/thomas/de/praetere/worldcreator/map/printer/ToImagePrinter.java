@@ -3,7 +3,7 @@ package com.thomas.de.praetere.worldcreator.map.printer;
 import com.sun.javafx.iio.ImageStorage;
 import com.thomas.de.praetere.worldcreator.map.Map;
 import com.thomas.de.praetere.worldcreator.map.MapPoint;
-import com.thomas.de.praetere.worldcreator.map.transformer.ConstantTransformer;
+import com.thomas.de.praetere.worldcreator.map.transformer.Creator;
 import com.thomas.de.praetere.worldcreator.map.util.Heighest;
 import com.thomas.de.praetere.worldcreator.map.util.Lowest;
 import com.thomas.de.praetere.worldcreator.map.util.MathUtil;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-public class ToImagePrinter implements ConstantTransformer {
+public class ToImagePrinter implements Creator<Boolean> {
     private final String pathName;
     private final String fileName;
 
@@ -25,7 +25,8 @@ public class ToImagePrinter implements ConstantTransformer {
     }
 
     @Override
-    public void transform(Map map) {
+    public Boolean create(Map map) {
+        System.out.println("Started Printing");
         BufferedImage image = new BufferedImage(map.getMaxX(), map.getMaxY(), ImageStorage.ImageType.RGB.ordinal());
         double maxHeight = new Heighest(map).calculate().getHeight();
         double minHeight = new Lowest(map).calculate().getHeight();
@@ -38,15 +39,23 @@ public class ToImagePrinter implements ConstantTransformer {
             }
         }
         try {
-            ImageIO.write(image, "jpg", new File(pathName, fileName));
+            ImageIO.write(image, "png", new File(pathName, fileName));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Finished printing.");
+        return true;
     }
 
     private int toRgb(MapPoint point, double lowest, double highest) {
-        int col = MathUtil.makeBetween256((point.getHeight() - lowest) / (highest - lowest));
-        Color c = new Color(col, col, col);
+        Color c;
+        if (point.getHeight() < 0) {
+            int col = MathUtil.makeBetween256((point.getHeight() - lowest) / (0 - lowest));
+            c = new Color(col, col, 255);
+        } else {
+            int col = MathUtil.makeBetween256((point.getHeight()) / (highest));
+            c = new Color(col, col, col);
+        }
         return c.getRGB();
     }
 }
